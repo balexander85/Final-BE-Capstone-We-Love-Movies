@@ -7,7 +7,8 @@ async function movieExists(request, response, next) {
     response.locals.movie = movie;
     return next();
   }
-  next({ status: 404, message: `Movie cannot be found.` });
+
+  return next({ status: 404, message: `Movie cannot be found.` });
 }
 
 async function read(request, response) {
