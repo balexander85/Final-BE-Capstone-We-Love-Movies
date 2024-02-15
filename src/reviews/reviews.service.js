@@ -1,11 +1,16 @@
 const db = require("../db/connection");
-const reduceProperties = require("../utils/reduce-properties");
+const mapProperties = require("../utils/map-properties");
 
-const reduceCritics = reduceProperties("review_id", {
-  preferred_name: ["critic", null, "preferred_name"],
-  surname: ["critic", null, "surname"],
-  organization_name: ["critic", null, "organization_name"],
-});
+const addCritics = () => {
+  return mapProperties({
+    "c_critic_id": "critic.critic_id",
+    "c_created_at": "critic.created_at",
+    "c_updated_at": "critic.updated_at",
+    "preferred_name": "critic.preferred_name",
+    "surname": "critic.surname",
+    "organization_name": "critic.organization_name",
+  })
+}
 
 const tableName = "reviews";
 
@@ -16,8 +21,15 @@ async function destroy(reviewId) {
 async function list(movie_id) {
   return db("reviews as r")
       .join("critics as c", "r.critic_id", "c.critic_id")
+      .select(`r.*`,
+          "c.critic_id as c_critic_id",
+          "c.created_at as c_created_at",
+          "c.updated_at as c_updated_at",
+          "c.preferred_name",
+          "c.organization_name",
+          "c.surname")
       .where({ movie_id })
-      .then(reduceCritics);
+      .then(reviews => reviews.map(addCritics()));
 }
 
 async function read(reviewId) {
