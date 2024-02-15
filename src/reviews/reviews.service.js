@@ -3,9 +3,9 @@ const mapProperties = require("../utils/map-properties");
 
 const addCritics = () => {
   return mapProperties({
-    "c_critic_id": "critic.critic_id",
-    "c_created_at": "critic.created_at",
-    "c_updated_at": "critic.updated_at",
+    "critic_id": "critic.critic_id",
+    "created_at": "critic.created_at",
+    "updated_at": "critic.updated_at",
     "preferred_name": "critic.preferred_name",
     "surname": "critic.surname",
     "organization_name": "critic.organization_name",
@@ -19,15 +19,9 @@ async function destroy(reviewId) {
 }
 
 async function list(movie_id) {
-  return db("reviews as r")
-      .join("critics as c", "r.critic_id", "c.critic_id")
-      .select(`r.*`,
-          "c.critic_id as c_critic_id",
-          "c.created_at as c_created_at",
-          "c.updated_at as c_updated_at",
-          "c.preferred_name",
-          "c.organization_name",
-          "c.surname")
+  return db(tableName)
+      .join("critics as c", "reviews.critic_id", "c.critic_id")
+      .select("reviews.*", "c.*")
       .where({ movie_id })
       .then(reviews => reviews.map(addCritics()));
 }
